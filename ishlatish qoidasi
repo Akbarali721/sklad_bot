@@ -1,0 +1,7 @@
+Agar dealer qo'shish kerak bo'lsa
+http://127.0.0.1:8000/auth/make-link?tg_id=DEALER_TG_ID
+bilan kiritiladi keyin magic link chiqadi uni
+http://127.0.0.1:8000/ keyin yoziladi.
+
+http://127.0.0.1:8000/auth/make-link?tg_id=7795257706
+admin ham shunday bo'ladi.

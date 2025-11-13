@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+<h4>Tumanlar</h4>
+<form method="post" class="row g-2 mb-3">
+  <div class="col-auto">
+    <input name="name" class="form-control" placeholder="Masalan: Shahrisabz tumani" required>
+  </div>
+  <div class="col-auto">
+    <button class="btn btn-primary">Qo'shish</button>
+  </div>
+</form>
+<table class="table table-bordered bg-white">
+  <thead><tr><th>#</th><th>Nomi</th><th>Yaratilgan</th></tr></thead>
+  <tbody>
+  {% for d in districts %}
+    <tr><td>{{ loop.index }}</td><td>{{ d.name }}</td><td>{{ d.created_at }}</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

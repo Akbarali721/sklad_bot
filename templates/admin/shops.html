@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block content %}
+<h4>Do'konlar</h4>
+
+<!-- Qo'shish formasi -->
+<form method="post" class="row g-2 mb-4">
+  <div class="col-md-4">
+    <input name="name" class="form-control" placeholder="Do'kon nomi" required>
+  </div>
+  <div class="col-md-4">
+    <select name="district_id" class="form-select" required>
+      <option value="">Tuman tanlang...</option>
+      {% for d in districts %}
+      <option value="{{ d.id }}">{{ d.name }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-md-2">
+    <button class="btn btn-primary w-100">Qo'shish</button>
+  </div>
+</form>
+
+<!-- Filtr va sahifalash boshqaruvi -->
+<form method="get" class="row g-2 align-items-end mb-3">
+  <div class="col-md-4">
+    <label class="form-label">Tuman bo'yicha filtr</label>
+    <select name="district_id" class="form-select">
+      <option value="">Barchasi</option>
+      {% for d in districts %}
+      <option value="{{ d.id }}" {% if district_id and d.id == district_id %}selected{% endif %}>{{ d.name }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-md-2">
+    <label class="form-label">Sahifa o'lchami</label>
+    <select name="size" class="form-select">
+      {% for s in [5,10,20,50] %}
+      <option value="{{ s }}" {% if s == size %}selected{% endif %}>{{ s }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-md-2">
+    <label class="form-label">Sahifa</label>
+    <input type="number" min="1" name="page" value="{{ page }}" class="form-control">
+  </div>
+  <div class="col-md-2">
+    <button class="btn btn-outline-secondary w-100">Qo'llash</button>
+  </div>
+</form>
+
+<!-- Statistika -->
+<p class="text-muted">
+  Jami: <b>{{ total }}</b> ta do'kon. Sahifa: <b>{{ page }}</b> / <b>{{ total_pages }}</b>.
+</p>
+
+<!-- Jadval -->
+<table class="table table-bordered bg-white align-middle">
+  <thead>
+    <tr><th>#</th><th>Nomi</th><th>Tuman</th><th>Yaratilgan</th></tr>
+  </thead>
+  <tbody>
+    {% if shops %}
+      {% for s in shops %}
+        <tr>
+          <td>{{ loop.index + (page - 1) * size }}</td>
+          <td>{{ s.name }}</td>
+          <td>{{ s.district.name if s.district else "-" }}</td>
+          <td>{{ s.created_at }}</td>
+        </tr>
+      {% endfor %}
+    {% else %}
+      <tr><td colspan="4" class="text-center text-muted">Hech narsa topilmadi</td></tr>
+    {% endif %}
+  </tbody>
+</table>
+
+<!-- Pagination nav -->
+<nav aria-label="pagination">
+  <ul class="pagination">
+    {% set qd = "&size=" ~ size ~ ( "&district_id=" ~ district_id if district_id else "" ) %}
+    <li class="page-item {% if page <= 1 %}disabled{% endif %}">
+      <a class="page-link" href="/admin/shops?page={{ page - 1 if page > 1 else 1 }}{{ qd }}">Oldingi</a>
+    </li>
+    <li class="page-item disabled"><span class="page-link">Sahifa {{ page }} / {{ total_pages }}</span></li>
+    <li class="page-item {% if page >= total_pages %}disabled{% endif %}">
+      <a class="page-link" href="/admin/shops?page={{ page + 1 if page < total_pages else total_pages }}{{ qd }}">Keyingi</a>
+    </li>
+  </ul>
+</nav>
+{% endblock %}

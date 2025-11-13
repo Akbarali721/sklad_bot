@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+<h3>Admin panel</h3>
+<div class="list-group">
+  <a href="/admin/districts" class="list-group-item list-group-item-action">Tumanlar</a>
+  <a href="/admin/shops" class="list-group-item list-group-item-action">Do'konlar</a>
+  <a href="/admin/products" class="list-group-item list-group-item-action">Mahsulotlar</a>
+  <a href="/admin/stock" class="list-group-item list-group-item-action">Ombor (kirim + qoldiq)</a>
+  <a href="/admin/monitor" class="list-group-item list-group-item-action">📊 Monitoring (do'konlar kesimi)</a>
+
+  <a href="/admin/balances" class="list-group-item list-group-item-action">💳 Do'kon balansi (qarz/to'lov)</a>
+
+</div>
+{% endblock %}

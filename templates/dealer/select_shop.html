@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<h4>Do'konni tanlang</h4>
+<div class="list-group">
+  {% for s in shops %}
+    <a class="list-group-item list-group-item-action" href="/dealer/deliver?district_id={{ district_id }}&shop_id={{ s.id }}">{{ s.name }}</a>
+  {% endfor %}
+</div>
+{% if not shops %}
+  <div class="alert alert-warning mt-3">Bu tumanda do'kon topilmadi. Admin paneldan qo'shing.</div>
+{% endif %}
+{% endblock %}

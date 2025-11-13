@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block content %}
+<h4>Mahsulotlar</h4>
+{% if request.query_params.get('error') == 'linked' %}
+<div class="alert alert-warning">Mahsulot bog‘liq yozuvlarga ega (kirim/chiqim). Avval ularni o‘chiring yoki mahsulotni “Faol”dan olib tashlang.</div>
+{% endif %}
+
+
+<!-- Yangi mahsulot qo'shish -->
+<form method="post" class="row g-2 mb-4">
+  <div class="col-md-3"><input name="name" class="form-control" placeholder="Nomi" required></div>
+  <div class="col-md-2"><input name="kind" class="form-control" placeholder="Turi (ixtiyoriy)"></div>
+  <div class="col-md-2"><input name="brand" class="form-control" placeholder="Brend (ixtiyoriy)"></div>
+  <div class="col-md-2"><input name="price_per_kg" class="form-control" placeholder="so'm/kg (ixtiyoriy)"></div>
+  <div class="col-md-2"><input name="in_price_per_pack" class="form-control" placeholder="kirim narxi (ixt.)"></div>
+  <div class="col-md-2"><input name="out_price_per_pack" class="form-control" placeholder="sotuv narxi (ixt.)"></div>
+  <div class="col-md-2">
+    <div class="form-check mt-2">
+      <input class="form-check-input" type="checkbox" name="is_active" id="is_active" checked>
+      <label class="form-check-label" for="is_active">Faol</label>
+    </div>
+  </div>
+  <div class="col-md-2"><button class="btn btn-success w-100">Qo'shish</button></div>
+</form>
+
+<table class="table table-striped bg-white align-middle">
+  <thead>
+    <tr>
+      <th>#</th><th>Nomi</th><th>Turi</th><th>Brend</th>
+      <th style="width:220px">so'm/kg (inline edit)</th>
+      <th style="width:160px">Faol</th>
+      <th>Yaratilgan</th>
+      <th class="text-end">Amal</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for p in products %}
+    <tr>
+      <td>{{ loop.index }}</td>
+      <td>{{ p.name }}</td>
+      <td>{{ p.kind or "-" }}</td>
+      <td>{{ p.brand or "-" }}</td>
+
+      <!-- Narxni inline tahrirlash -->
+      <td>
+        <form method="post" action="/admin/products/{{ p.id }}/price" class="d-flex gap-2">
+          <input name="price_per_kg" class="form-control form-control-sm" placeholder="so'm/kg"
+                 value="{{ '' if p.price_per_kg is none else p.price_per_kg }}">
+          <button class="btn btn-sm btn-outline-primary">Saqlash</button>
+        </form>
+      </td>
+
+      <!-- Faollikni almashtirish -->
+      <td>
+        <form method="post" action="/admin/products/{{ p.id }}/active" class="d-flex align-items-center gap-2">
+          <input class="form-check-input" type="checkbox" name="is_active" value="true" {% if p.is_active %}checked{% endif %}>
+          <button class="btn btn-sm btn-outline-secondary">Yangilash</button>
+        </form>
+      </td>
+
+      <td>{{ p.created_at }}</td>
+      <td class="text-end">
+        <form method="post" action="/admin/products/{{ p.id }}/delete" onsubmit="return confirm('Rostdan ham o\'chirasizmi?');" style="display:inline-block">
+          <button class="btn btn-sm btn-outline-danger">O\'chirish</button>
+        </form>
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

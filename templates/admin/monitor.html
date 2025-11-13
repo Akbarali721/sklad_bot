@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+{% block content %}
+<h4>📊 Monitoring — do'konlar kesimi</h4>
+
+<form method="get" class="row g-2 align-items-end mb-3">
+  <div class="col-md-3">
+    <label class="form-label">Tuman</label>
+    <select name="district_id" class="form-select" onchange="this.form.submit()">
+      <option value="">Barchasi</option>
+      {% for d in districts %}
+        <option value="{{ d.id }}" {% if district_id and d.id == district_id %}selected{% endif %}>{{ d.name }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-md-3">
+    <label class="form-label">Do'kon</label>
+    <select name="shop_id" class="form-select">
+      <option value="">Barchasi</option>
+      {% for s in shops %}
+        <option value="{{ s.id }}" {% if shop_id and s.id == shop_id %}selected{% endif %}>{{ s.name }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-md-2">
+    <label class="form-label">Kun oralig'i</label>
+    <select name="days" class="form-select">
+      {% for d in [1,7,14,30,60,90] %}
+        <option value="{{ d }}" {% if d == days %}selected{% endif %}>{{ d }} kun</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-md-2">
+    <button class="btn btn-primary w-100">Qo'llash</button>
+  </div>
+</form>
+
+<div class="row g-3 mb-3">
+  <div class="col-md-4">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <div class="text-muted">Jami tranzaksiya</div>
+        <div class="h4 mb-0">{{ total_cnt }}</div>
+        <small class="text-muted">{{ start }} — {{ end }}</small>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <div class="text-muted">Jami kg</div>
+        <div class="h4 mb-0">{{ '%.3f'|format(total_qty) }}</div>
+        <small class="text-muted">{{ start }} — {{ end }}</small>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <div class="text-muted">Jami summa</div>
+        <div class="h4 mb-0">{{ '%.0f'|format(total_sum) }} so'm</div>
+        <small class="text-muted">{{ start }} — {{ end }}</small>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3">
+  <div class="col-lg-7">
+    <div class="card shadow-sm">
+      <div class="card-header">Do'konlar bo'yicha yig'indi</div>
+      <div class="card-body p-0">
+        <table class="table table-striped m-0">
+          <thead>
+          <tr><th>#</th><th>Do'kon</th><th>Tranzaksiya</th><th>Kg</th><th>Summa</th></tr>
+          </thead>
+          <tbody>
+          {% for r in by_shop %}
+            <tr>
+              <td>{{ loop.index }}</td>
+              <td>
+                {% if district_id %}
+                  <a href="/admin/monitor?district_id={{ district_id }}&shop_id={{ r.shop_id }}&days={{ days }}">{{ r.shop_name }}</a>
+                {% else %}
+                  <a href="/admin/monitor?shop_id={{ r.shop_id }}&days={{ days }}">{{ r.shop_name }}</a>
+                {% endif %}
+              </td>
+              <td>{{ r.cnt }}</td>
+              <td>{{ '%.3f'|format(r.sum_qty) }}</td>
+              <td>{{ '%.0f'|format(r.sum_total) }}</td>
+            </tr>
+          {% endfor %}
+          {% if not by_shop %}
+            <tr><td colspan="5" class="text-center text-muted">Ma'lumot topilmadi</td></tr>
+          {% endif %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card shadow-sm mt-3">
+      <div class="card-header">So'nggi tranzaksiyalar</div>
+      <div class="card-body p-0">
+        <table class="table table-hover m-0">
+          <thead>
+          <tr><th>#</th><th>Sana</th><th>Do'kon</th><th>Mahsulot</th><th>Kg</th><th>Narx</th><th>Jami</th><th>To'lov</th></tr>
+          </thead>
+          <tbody>
+          {% for r in last_rows %}
+            <tr>
+              <td>{{ r.id }}</td>
+              <td>{{ r.created_at }}</td>
+              <td>{{ r.shop_name }}</td>
+              <td>{{ r.product_name }}</td>
+              <td>{{ '%.3f'|format(r.qty_kg) }}</td>
+              <td>{{ '%.0f'|format(r.unit_price) }}</td>
+              <td><b>{{ '%.0f'|format(r.total) }}</b></td>
+              <td>{{ r.pay_kind }}</td>
+            </tr>
+          {% endfor %}
+          {% if not last_rows %}
+            <tr><td colspan="8" class="text-center text-muted">Tranzaksiya yo'q</td></tr>
+          {% endif %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-5">
+    <div class="card shadow-sm">
+      <div class="card-header">To'lov turlari bo'yicha</div>
+      <div class="card-body p-0">
+        <table class="table table-sm m-0">
+          <thead><tr><th>To'lov</th><th>Tranzaksiya</th><th>Kg</th><th>Summa</th></tr></thead>
+          <tbody>
+          {% for r in by_pay %}
+            <tr>
+              <td>{{ r.pay_kind }}</td>
+              <td>{{ r.cnt }}</td>
+              <td>{{ '%.3f'|format(r.sum_qty) }}</td>
+              <td>{{ '%.0f'|format(r.sum_total) }}</td>
+            </tr>
+          {% endfor %}
+          {% if not by_pay %}
+            <tr><td colspan="4" class="text-center text-muted">Ma'lumot yo'q</td></tr>
+          {% endif %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    {% if by_product_in_shop %}
+    <div class="card shadow-sm mt-3">
+      <div class="card-header">Tanlangan do'konda mahsulotlar kesimi</div>
+      <div class="card-body p-0">
+        <table class="table table-sm m-0">
+          <thead><tr><th>Mahsulot</th><th>Kg</th><th>Summa</th></tr></thead>
+          <tbody>
+          {% for r in by_product_in_shop %}
+            <tr>
+              <td>{{ r.product_name }}</td>
+              <td>{{ '%.3f'|format(r.sum_qty) }}</td>
+              <td>{{ '%.0f'|format(r.sum_total) }}</td>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

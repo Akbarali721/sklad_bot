@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block content %}
+<h3>Diler balansi</h3>
+
+<form method="get" class="row row-cols-lg-auto g-2 align-items-end mb-3">
+  <div class="col-12">
+    <label class="form-label">Tuman</label>
+    <select class="form-select" name="district_id" onchange="this.form.submit()">
+      <option value="">— Tanlang —</option>
+      {% for d in districts %}
+      <option value="{{ d.id }}" {% if district_id and d.id == district_id %}selected{% endif %}>{{ d.name }}</option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <div class="col-12">
+    <label class="form-label">Do'kon</label>
+    <select class="form-select" name="shop_id" {% if not shops %}disabled{% endif %} onchange="this.form.submit()">
+      <option value="">— Tanlang —</option>
+      {% for s in shops %}
+      <option value="{{ s.id }}" {% if shop_id and s.id == shop_id %}selected{% endif %}>{{ s.name }}</option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <div class="col-12">
+    <button class="btn btn-primary">Ko'rsatish</button>
+  </div>
+</form>
+
+{% if shop_id %}
+  <div class="mb-3">
+    <h5>Joriy balans:
+      <span class="badge {% if balance>0 %}bg-warning text-dark{% elif balance<0 %}bg-success{% else %}bg-secondary{% endif %}">
+        {{ '%.0f'|format(balance) }} so'm
+      </span>
+    </h5>
+    <small class="text-muted">Izoh: musbat = do'konning qarzi; manfiy = ortiqcha to'lov.</small>
+  </div>
+
+  <div class="card">
+    <div class="card-header">Tranzaksiyalar</div>
+    <div class="card-body p-0">
+      <table class="table table-sm table-striped mb-0 align-middle">
+        <thead><tr><th>Sana</th><th>Turi</th><th>Summa</th><th>Izoh</th></tr></thead>
+        <tbody>
+          {% for t in txs %}
+          <tr>
+            <td>{{ t.created_at.strftime('%Y-%m-%d %H:%M') if t.created_at else '' }}</td>
+            <td>
+              {% if t.kind.value == 'sale' %}
+                <span class="badge bg-warning text-dark">sale</span>
+              {% else %}
+                <span class="badge bg-success">payment</span>
+              {% endif %}
+            </td>
+            <td>{{ '%.0f'|format(t.amount) }}</td>
+            <td>{{ t.note or '-' }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="alert alert-success">
+  <h5>✅ Qabul qilindi!</h5>
+  <p><b>{{ product.name }}</b> bo'yicha tranzaksiya saqlandi.</p>
+  <ul>
+    <li>Miqdor: {{ delivery.qty_kg }} kg</li>
+    <li>Narx: {{ delivery.unit_price }} so'm/kg</li>
+    <li>Jami: <b>{{ delivery.total }}</b> so'm</li>
+    <li>To'lov: {{ delivery.pay_kind }}</li>
+    <li>Sana: {{ delivery.created_at }}</li>
+  </ul>
+</div>
+<a class="btn btn-outline-primary" href="/dealer/start">Yana davom etish</a>
+{% endblock %}

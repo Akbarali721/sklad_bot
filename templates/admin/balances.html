@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block content %}
+<h3>Do'konlar balansi</h3>
+<form class="row row-cols-lg-auto g-2 align-items-center mb-3" method="get">
+  <div class="col-12">
+    <select class="form-select" name="district_id">
+      <option value="">— Barcha tumanlar —</option>
+      {% for d in districts %}
+      <option value="{{ d.id }}" {% if district_id and d.id == district_id %}selected{% endif %}>{{ d.name }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-12"><button class="btn btn-primary">Filter</button></div>
+</form>
+
+<table class="table table-sm table-striped align-middle">
+  <thead>
+    <tr>
+      <th>#</th><th>Do'kon</th><th>Balans (so'm)</th><th></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for row in items %}
+    <tr>
+      <td>{{ loop.index }}</td>
+      <td>{{ row.name }}</td>
+      <td>
+        <span class="badge {% if row.balance>0 %}bg-warning text-dark{% elif row.balance<0 %}bg-success{% else %}bg-secondary{% endif %}">
+          {{ '%.0f'|format(row.balance) }}
+        </span>
+      </td>
+      <td class="text-end">
+        <a class="btn btn-sm btn-outline-secondary" href="/admin/shops/{{ row.id }}/tx">Tafsilot</a>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
